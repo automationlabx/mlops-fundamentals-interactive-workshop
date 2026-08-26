@@ -79,7 +79,7 @@ jobs:
           python promote.py
           python rollback.py --version "$PASSING_VERSION"
 
-      - name: Verify monitoring and drift signal
+      - name: Verify dashboard, monitoring and drift signal
         id: monitoring
         shell: bash
         run: |
@@ -88,6 +88,8 @@ jobs:
           API_PID=$!
           trap 'kill $API_PID || true' EXIT
           sleep 3
+          curl -fsS http://127.0.0.1:8000/dashboard | grep -q "MLOps Workshop Dashboard"
+          curl -fsS http://127.0.0.1:8000/status-data | grep -q '"serving_matches_registry":true
           python generate_traffic.py --profile normal --requests 40
           python monitor.py | tee monitor_normal.log
           rm -f monitoring/predictions.csv
@@ -111,7 +113,7 @@ jobs:
             echo "| Complete quality gate | ${{ steps.tests.outcome }} |"
             echo "| Weak candidate rejection | ${{ steps.reject.outcome }} |"
             echo "| Rollback | ${{ steps.rollback.outcome }} |"
-            echo "| Monitoring and drift signal | ${{ steps.monitoring.outcome }} |"
+            echo "| Dashboard, monitoring and drift signal | ${{ steps.monitoring.outcome }} |"
             echo ""
             echo "Commit: \`${GITHUB_SHA}\`"
             echo ""
