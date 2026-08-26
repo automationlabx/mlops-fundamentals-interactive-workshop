@@ -1,0 +1,37 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local MLflow runtime state
+mlflow.db
+mlruns/
+mlartifacts/
+
+# Generated data and model state
+data/churn.csv
+data/reference_stats.json
+models/*.joblib
+candidate.json
+passing_candidate.json
+
+# Monitoring and temporary logs
+monitoring/predictions.csv
+monitoring/*.html
+*.log
+
+# Distributed course material - keep out of the public submission repository
+Workshop_Guide*.docx
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local dry-run backups
+RC1_backup_*/
