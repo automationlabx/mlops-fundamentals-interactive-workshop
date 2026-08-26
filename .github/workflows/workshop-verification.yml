@@ -89,7 +89,7 @@ jobs:
           trap 'kill $API_PID || true' EXIT
           sleep 3
           curl -fsS http://127.0.0.1:8000/dashboard | grep -q "MLOps Workshop Dashboard"
-          curl -fsS http://127.0.0.1:8000/status-data | grep -q '"serving_matches_registry":true
+          curl -fsS http://127.0.0.1:8000/status-data | grep -q '"serving_matches_registry":true'
           python generate_traffic.py --profile normal --requests 40
           python monitor.py | tee monitor_normal.log
           rm -f monitoring/predictions.csv
