@@ -13,12 +13,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
+          python-version: "3.13"
 
       - name: Install dependencies
         run: |
@@ -27,8 +27,8 @@ jobs:
 
       - name: Clean generated state
         run: |
-          rm -rf mlflow.db mlruns candidate.json passing_candidate.json
-          rm -f models/*.joblib monitoring/predictions.csv
+          rm -rf mlflow.db mlruns mlartifacts candidate.json passing_candidate.json
+          rm -f models/*.joblib monitoring/predictions.csv monitoring/*.html
           rm -f data/churn.csv data/reference_stats.json *.log
 
       - name: Verify participant-added API test
@@ -45,7 +45,7 @@ jobs:
         id: train
         run: |
           python train.py --kind logreg --run-name baseline
-          python train.py --kind rf --run-name rf_candidate --max-depth 6 --n-estimators 200
+          python train.py --kind rf --run-name rf_candidate --max-depth 6 --n-estimators 200 --candidate
           cp candidate.json passing_candidate.json
 
       - name: Promote the passing candidate
@@ -60,7 +60,7 @@ jobs:
         id: reject
         shell: bash
         run: |
-          python train.py --kind weak_rf --run-name intentionally_bad
+          python train.py --kind weak_rf --run-name intentionally_bad --candidate
           if python promote.py; then
             echo "ERROR: weak candidate was promoted"
             exit 1
@@ -75,7 +75,7 @@ jobs:
           print(json.load(open("passing_candidate.json"))["version"])
           PY
           )
-          python train.py --kind rf --run-name rf_candidate_v2 --max-depth 8 --n-estimators 300
+          python train.py --kind rf --run-name rf_candidate_v2 --max-depth 8 --n-estimators 300 --candidate
           python promote.py
           python rollback.py --version "$PASSING_VERSION"
 
@@ -117,3 +117,4 @@ jobs:
             echo ""
             echo "The workflow run status is the certificate source of truth: green = PASS, red = FAIL."
           } >> "$GITHUB_STEP_SUMMARY"
+
